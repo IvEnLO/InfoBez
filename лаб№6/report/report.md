@@ -1,0 +1,199 @@
+---
+## Front matter
+title: "Отчёт по лабораторной работе №5"
+subtitle: "Дисциплина: Информационная безопасность"
+author: "Евдокимов Иван Андреевич"
+
+## Generic otions
+lang: ru-RU
+toc-title: "Содержание"
+
+## Bibliography
+bibliography: bib/cite.bib
+csl: pandoc/csl/gost-r-7-0-5-2008-numeric.csl
+
+## Pdf output format
+toc: true # Table of contents
+toc-depth: 2
+lof: true # List of figures
+lot: true # List of tables
+fontsize: 12pt
+linestretch: 1.5
+papersize: a4
+documentclass: scrreprt
+## I18n polyglossia
+polyglossia-lang:
+  name: russian
+  options:
+	- spelling=modern
+	- babelshorthands=true
+polyglossia-otherlangs:
+  name: english
+## I18n babel
+babel-lang: russian
+babel-otherlangs: english
+## Fonts
+mainfont: PT Serif
+romanfont: PT Serif
+sansfont: PT Sans
+monofont: PT Mono
+mainfontoptions: Ligatures=TeX
+romanfontoptions: Ligatures=TeX
+sansfontoptions: Ligatures=TeX,Scale=MatchLowercase
+monofontoptions: Scale=MatchLowercase,Scale=0.9
+## Biblatex
+biblatex: true
+biblio-style: "gost-numeric"
+biblatexoptions:
+  - parentracker=true
+  - backend=biber
+  - hyperref=auto
+  - language=auto
+  - autolang=other*
+  - citestyle=gost-numeric
+## Pandoc-crossref LaTeX customization
+figureTitle: "Рис."
+tableTitle: "Таблица"
+listingTitle: "Листинг"
+lofTitle: "Список иллюстраций"
+lotTitle: "Список таблиц"
+lolTitle: "Листинги"
+## Misc options
+indent: true
+header-includes:
+  - \usepackage{indentfirst}
+  - \usepackage{float} # keep figures where there are in the text
+  - \floatplacement{figure}{H} # keep figures where there are in the text
+---
+
+# Техническое оснащение:
+
+-   Персональный компьютер с операционной системой Windows 10;
+-   OBS Studio, использующийся для записи скринкаста лабораторной работы;
+-   Приложение Visual Studio Code для редактирования файлов формата *md*, а также для конвертации файлов отчётов и презентаций;
+
+# Цель работы:
+
+Развить навыки администрирования ОС Linux. Получить первое практическое знакомство с технологией SELinux. Проверить работу SELinx на практике совместно с веб-сервером Apache.
+
+# Выполнение лабораторной работы
+
+1. Вошёл в систему с полученными учётными данными и убедился, что SELinux работает в режиме enforcing политики targeted. Обратился с помощью браузера к веб-серверу, запущенному на компьютере, и убедился, что последний работает (рис. 1).
+
+![Рис. 1](image/6.1.png) 
+
+2. Обратитесь с помощью браузера к веб-серверу, запущенному на вашем компьютере, и убедитесь, что последний работает: service httpd status, запустил его так же, но с параметром start.(рис. 2).
+
+![Рис. 2](image/6.2.png)
+
+3. Найшёл веб-сервер Apache в списке процессов, определил его контекст безопасности , использовав командуps auxZ | grep httpd (рис. 3).
+
+![Рис. 3](image/6.3.png)
+
+4. Посмотрите текущее состояние переключателей SELinux для Apache с помощью команды sestatus -b | grep httpd (рис. 4)
+
+![Рис. 4](image/6.4.png)
+
+5. Посмотрел статистику по политике с помощью команды seinfo, также
+определите множество пользователей, ролей, типов. (рис. 5).
+
+![Рис. 5](image/6.5.png)
+
+6. Определил тип файлов и поддиректорий, находящихся в директории/var/www, с помощью команды ls -lZ /var/www (рис. 6).
+
+![Рис. 6](image/6.6.png)
+
+7. Определил тип файлов, находящихся в директории /var/www/html:
+ls -lZ /var/www/html (рис. 7).
+
+![Рис. 7](image/6.7.png)
+
+8. Определил круг пользователей, которым разрешено создание файлов в
+директории /var/www/html. (рис. 8).
+
+![Рис. 8](image/6.8.png)
+
+9. Создал от имени суперпользователя (так как в дистрибутиве после установки только ему разрешена запись в директорию) html-файл /var/www/html/test.html (рис. 9).
+
+![Рис. 9](image/6.9.png)
+
+10. Проверьте контекст созданного вами файла. Занесите в отчёт контекст, присваиваемый по умолчанию вновь созданным файлам в директории /var/www/html. (рис. 10).
+
+![Рис. 10](image/6.10.png)
+
+11. Обратился к файлу через веб-сервер, введя в браузере адрес http://127.0.0.1/test.html. Убедился, что файл был успешно отображён. (рис. 11).
+
+![Рис. 11](image/6.11.png)
+
+
+12. Изучил справку man httpd_selinux и выясните, какие контексты файлов определены для httpd. Сопоставил их с типом файла test.html. Проверить контекст файла можно командой ls -Z. ls -Z /var/www/html/test.html (рис. 12).
+
+![Рис. 12](image/6.12.png)
+
+13. Изменил контекст файла /var/www/html/test.html httpd_sys_content_t на любой другой, к которому процесс httpd не должен иметь доступа, например, на samba_share_t: chcon -t samba_share_t /var/www/html/test.html ls -Z /var/www/html/test.html После этого проверил, что контекст поменялся.(рис. 13).
+
+![Рис. 13](image/6.13.png)
+
+14. Попробуйте ещё раз получить доступ к файлу через веб-сервер, введя в браузере адрес http://127.0.0.1/test.html. Вы должны получить сообщение об ошибке:
+Forbidden
+You don't have permission to access /test.html on this server. (рис. 14).
+
+![Рис. 14](image/6.14.png)
+
+
+15. Проанализировал ситуацию. Почему файл не был отображён, если права
+доступа позволяют читать этот файл любому пользователю?
+ls -l /var/www/html/test.html
+Просмотрите log-файлы веб-сервера Apache. Также просмотрел системный лог-файл:
+tail /var/log/messages
+(рис. 15).
+
+![Рис. 15](image/6.15.png)
+
+16. Попробовал запустить веб-сервер Apache на прослушивание ТСР-порта 81 (а не 80, как рекомендует IANA и прописано в /etc/services). Для этого в файле /etc/httpd/httpd.conf найдите строчку Listen 80 и замените её на Listen 81. (рис. 16).
+
+![Рис. 16](image/6.16.png)
+
+17. Выполните перезапуск веб-сервера Apache. Произошёл сбой (рис. 17).
+
+![Рис. 17](image/6.17.png)
+
+18. Проанализировал лог-файлы: tail -nl /var/log/messages Просмотрел файлы /var/log/http/error_log,
+/var/log/http/access_log и /var/log/audit/audit.log и выяснил, в каких файлах появились записи (рис. 18).
+
+![Рис. 18](image/6.18.png)
+
+19. Выполнил команду semanage port -a -t http_port_t -р tcp 81 После этого проверил список портов командой
+semanage port -l | grep http_port_t
+Убедился, что порт 81 появился в списке(рис. 19).
+
+![Рис. 19](image/6.19.png)
+
+20. Пробую запустить веб-сервер Apache ещё раз (рис. 20).
+
+![Рис. 20](image/6.20.png).  
+
+21. Вернул контекст httpd_sys_cоntent__t к файлу /var/www/html/ test.html: chcon -t httpd_sys_content_t /var/www/html/test.html После этого попробовал получить доступ к файлу через веб-сервер, введя в браузере адрес http://127.0.0.1:81/test.html. Увидеть содержимое файла — слово «test»(рис. 21).
+
+![Рис. 21](image/6.21.png). 
+
+22. . Исправил обратно конфигурационный файл apache, вернув Listen 80 (рис. 22).
+
+![Рис. 22](image/6.22.png). 
+
+23. Удалил привязку http_port_t к 81 порту:
+semanage port -d -t http_port_t -p tcp 81
+и проверил, что порт 81 удалён,затем удалил файл /var/www/html/test.html:
+rm /var/www/html/test.html
+
+![Рис. 23](image/6.23.png).
+
+**Выводы:**
+
+Развил навыки администрирования ОС Linux. Получил первое практическое знакомство с технологией SELinux. Проверил работу SELinx на практике совместно с веб-сервером Apache.
+
+# Список литературы
+
+1.  [Официальный сайт VirtualBox](https://www.virtualbox.org/)
+2.  [Материал для выполнения лабораторной](https://esystem.rudn.ru/pluginfile.php/2090282/mod_resource/content/2/006-lab_selinux.pdf)
+3.  [Официальный сайт CentOS](https://www.centos.org/)

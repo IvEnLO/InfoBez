@@ -1,0 +1,173 @@
+Lab5:
+№00: (max)
+gcc -v (yum install gcc)
+sudo setenforce 0
+getenforce
+whereis gcc
+whereis g++
+
+№01: (guest)
+us guest
+
+№02: (guest)
+touch simpleid.c
+Код:
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+int
+main ()
+{
+	uid_t uid = geteuid ();
+	gid_t gid = getegid ();
+	printf ("uid=%d, gid=%d\n", uid, gid);
+	return 0;
+}
+
+№03: (guest)
+gcc simpleid.c -o simpleid
+
+№04: (guest)
+./simpleid
+
+№5: (guest)
+id
+
+№06: (guest)
+touch simpleid2.c
+код2:
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+int
+main ()
+{
+	uid_t real_uid = getuid ();
+	uid_t e_uid = geteuid ();
+	gid_t real_gid = getgid ();
+	gid_t e_gid = getegid () ;
+	printf ("e_uid=%d, e_gid=%d\n", e_uid, e_gid);
+	printf ("real_uid=%d, real_gid=%d\n", real_uid,
+	,! real_gid);
+	return 0;
+}
+
+№07: (guest)
+gcc simpleid2.c -o simpleid2
+./simpleid2
+
+№08: (max)
+chown root:guest /home/guest/simpleid2
+chmod u+s /home/guest/simpleid2
+
+№09: (-)
+#описать 08#
+
+№10: (guest)
+ls -l simpleid2
+
+№11: (guest)
+./simpleid2
+id
+
+№12: (guest)
+#???#
+sudo id
+
+№13: (guest)
+touch readfile.c
+код:
+#include <fcntl.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+int
+main (int argc, char* argv[])
+{
+	unsigned char buffer[16];
+	size_t bytes_read;
+	int i;
+	int fd = open (argv[1], O_RDONLY);
+	do
+	{
+		bytes_read = read (fd, buffer, sizeof (buffer));
+		for (i =0; i < bytes_read; ++i) printf("%c", buffer[i]);
+	}
+	while (bytes_read == sizeof (buffer));
+	close (fd);
+	return 0;
+}
+
+№14: (guest)
+gcc readfile.c -o readfile
+
+№15: (max)
+chown root:guest /home/guest/readfile
+
+№16: (guest)
+cat /home/guest/readfile.c
+
+№17: (max)
+chmod u+s readfile
+
+№18: (guest/max)
+./readfile readfile.c
+
+№19: (guest/max)
+./readfile /etc/shadow
+
+------------------------------------------------------------------------
+№01: (max)
+ls -l / | grep tmp
+
+№02: (guest)
+echo "test" > /tmp/file01.txt
+
+№03: (guest)
+ls -l /tmp/file01.txt
+chmod o+rw /tmp/file01.txt
+ls -l /tmp/file01.txt
+
+№04: (guest2)
+cat /tmp/file01.txt
+
+№05: (guest2)
+echo "test2" > /tmp/file01.txt
+
+№06: (guest2/guest)
+cat /tmp/file01.txt
+
+№07: (guest2)
+echo "test3" > /tmp/file01.txt
+
+№08: (guest2/guest)
+cat /tmp/file01.txt
+
+№09: (guest2)
+rm /tmp/fileOl.txt
+
+№10: (guest2)
+su -
+chmod -t /tmp
+
+№11: (guest2)
+exit
+
+№12: (guest2)
+ls -l / | grep tmp
+
+№13: (guest2)
+cat /tmp/file01.txt
+echo "test3" > /tmp/file01.txt
+cat /tmp/file01.txt
+rm /tmp/fileOl.txt
+
+№14: (-)
+#описать выше#
+
+№15: (guest2)
+su -
+chmod +t /tmp
+exit
+
